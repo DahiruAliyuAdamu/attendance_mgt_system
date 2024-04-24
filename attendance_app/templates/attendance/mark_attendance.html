@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Mark Attendance{% endblock %}
+
+{% block content %}
+    <div class="flex items-center justify-center h-screen">
+        <div class="bg-white p-8 shadow-md rounded-lg max-w-md w-full">
+            <h1 class="text-2xl font-bold mb-4">Mark Attendance</h1>
+            <!-- Your attendance marking interface goes here -->
+            <form method="post" enctype="multipart/form-data" class="max-w-sm mx-auto mark_attendance">
+                {% csrf_token %}
+                <div class="text-red-600 text-center rounded-md mb-2">
+                    <p class="error_message"></p>
+                    <p class="success_message"></p>
+                </div>               
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="employee_id">Employee ID</label>
+                    <input class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="employee_id" name="employee_id" type="text" placeholder="Employee ID">
+                </div>            
+                <div class="mb-4">
+                    <label for="action" class="block text-gray-700">Action:</label>
+                    <select id="action" name="action" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500">
+                        <option value="time_in">Time In</option>
+                        <option value="break_time">Break Time</option>
+                        <option value="time_out">Time Out</option>
+                    </select>
+                </div>
+                <div class="text-red-600 rounded-md mb-2">
+                    <p class="id_error"></p>
+                </div>                
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Mark Attendance</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+<script>
+    $(document).ready(function() {
+        $('body').on('submit', '.mark_attendance', function(e) {
+            e.preventDefault()
+            let employee_id = $('#employee_id').val()
+
+            if (employee_id == '') {
+                $('.id_error').text('Error: Employee ID and action are required')
+            } else {
+                $('.id_error').text('')
+                $.ajax({
+                    url: "{% url 'attendance:mark_attendance' %}",
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    beforeSend: function() {
+                        
+                    },
+                    success: function(response) {
+                        if (response.status == 'success') {
+                            $('.success_message').text(response.message)
+                        } else {
+                            $('.error_message').text(response.message)
+                        }
+                    },
+                    complete: function() {
+                        
+                    },
+                    error: function(err) {
+                        alert(err)
+                    }
+                })
+            }
+        })
+    })
+</script>
+{% endblock %}

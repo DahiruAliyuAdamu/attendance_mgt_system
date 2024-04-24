@@ -1,0 +1,132 @@
+<!-- view_attendance_report.html -->
+{% extends 'base.html' %}
+
+{% block title %}View Attendance Report{% endblock %}
+
+{% block content %}
+<div class="container mx-auto lg:w-4/5 xl:w-4/5 sm:w-19/20 mt-10">
+    <h1 class="text-2xl font-bold mb-4">Attendance Report</h1>
+
+    <div class="bg-gray-100 rounded-lg p-6 flex flex-wrap">
+        <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/3 mb-4 px-4">
+            <h2 class="text-lg font-semibold mb-2">Total Employees</h2>
+            <p>{{ total_employees }}</p>
+        </div>
+        <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/3 mb-4 px-4">
+            <h2 class="text-lg font-semibold mb-2">Total Working Days</h2>
+            <p>{{ total_working_days }}</p>
+        </div>
+        <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/3 mb-4 px-4">
+            <h2 class="text-lg font-semibold mb-2">Average Work Hours per Day</h2>
+            <p>{{ average_work_hours }}</p>
+        </div>
+        <!-- Add more summary statistics as needed -->
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <canvas id="attendanceChart" class="w-full"></canvas>
+        </div>
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <canvas id="barChart" class="w-full"></canvas>
+        </div>
+    </div>
+
+    {% if attendance_records %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full table-auto">
+            <thead>
+                <tr>
+                    <th class="px-4 py-2 bg-gray-200">Employee</th>
+                    <th class="px-4 py-2 bg-gray-200">Date</th>
+                    <th class="px-4 py-2 bg-gray-200">Time In</th>
+                    <th class="px-4 py-2 bg-gray-200">Break Time</th>
+                    <th class="px-4 py-2 bg-gray-200">Time Out</th>
+                    <th class="px-4 py-2 bg-gray-200">Actions</th> <!-- New column for actions -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in attendance_records %}
+                <tr>
+                    <td class="border px-4 py-2">{{ record.employee.name }}</td>
+                    <td class="border px-4 py-2">{{ record.date }}</td>
+                    <td class="border px-4 py-2">{{ record.time_in|time:"H:i:s" }}</td>
+                    <td class="border px-4 py-2">{% if record.break_time|time:"H:i:s" %}{{ record.break_time }}{% else %}N/A{% endif %}</td>
+                    <td class="border px-4 py-2">{% if record.time_out|time:"H:i:s" %}{{ record.time_out }}{% else %}N/A{% endif %}</td>
+                    <td class="border px-4 py-2">
+                        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline">Edit</button>
+                        <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline ml-2">Delete</button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td class="border px-4 py-2" colspan="5">No attendance records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>No attendance records found.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    $(document).ready(function () {
+        let ctx = document.getElementById('attendanceChart').getContext('2d');
+        let myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: '{{ dates }}',
+                datasets: [{
+                    label: 'Attendance Trend',
+                    data: '{{ attendance_counts }}',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+
+
+        let ctx1 = document.getElementById('barChart').getContext('2d');
+        let barChart = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: '{{months}}',  // Labels for x-axis (e.g., categories or time periods)
+                datasets: [{
+                    label: 'Attendance Counts',
+                    data: '{{attendance_counts}}',   // Attendance counts for corresponding labels
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        })
+    })
+</script>
+{% endblock %}
