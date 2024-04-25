@@ -1,0 +1,15 @@
+# Byte-compiled Python files
+*.pyc
+__pycache__/
+
+# SQLite database file
+*.sqlite3
+
+# Static files collected by Django
+staticfiles/
+
+# Media files uploaded by users
+media/
+
+# Environment configuration file
+.env
