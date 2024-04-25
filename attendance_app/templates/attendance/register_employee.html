@@ -11,15 +11,17 @@
                 <div class="text-green-600 text-center rounded-md mb-2">
                     <p class="message"></p>
                 </div>
+                <div class="text-red-600 text-center rounded-md mb-2">
+                    <p class="error_message"></p>
+                </div>
                 {{form}}
                 <p class="error" style="color: red;"></p>
                 <div class="text-red-600 text-center rounded-md mb-2">
                     <p class="error"></p>
                 </div>
                 <div class="flex items-center justify-between">
-                    <button id="picture" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 flex justify-center items-center">Take a Picture</button>
-                    <button class="btn_text bg-blue-600 text-white p-2 rounded hover:bg-blue-700 flex justify-center items-center" type="submit">
-                        <div class="loader w-6 h-6 mr-2 border-t-4 border-b-4 border-blue-500 rounded-full animate-spin"></div>
+                    <button id="picture" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 flex justify-center items-center" type="button">Take a Picture</button>
+                    <button id="btn_text" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 flex justify-center items-center" type="submit">
                         Register
                     </button>
                 </div>
@@ -33,7 +35,7 @@
 {% block js %}
 <script>
     $('.loader').hide()
-    $('.btn_text').prop('disabled', true)
+    $('#btn_text').prop('disabled', true)
     // $('#picture').fadeOut(); // Hide with fade animation
 
     $(document).ready(function() {
@@ -46,14 +48,18 @@
                 data: $(this).serialize(),
                 beforeSend: function() {
                     $('.loader').show()
-                    $('.btn_text').text('Please wait...')
-                    $('.btn_text').prop('disabled', true)
+                    $('#btn_text').html(`
+                        <div class="loader w-6 h-6 mr-2 border-t-4 border-b-4 border-blue-500 rounded-full animate-spin"></div>
+                        Please wait...
+                    `)
+                    $('#btn_text').prop('disabled', true)
                 },
                 success: function(response) {
                     if (response.status == 'success') {
-                        alert(response.message)
                         $('.message').text(response.message)
                         $('#form_reg').trigger('reset')
+                    } else {
+                        $('.error_message').text(response.message)
                     }
                     // $('#attendance-result').html(response)
                 },
@@ -62,23 +68,31 @@
                 },
                 complete: function() {
                     $('.loader').hide()
-                    $('.btn_text').text('Register')
-                    $('.btn_text').prop('disabled', false)
+                    $('#btn_text').text('Register')
+                    $('#btn_text').prop('disabled', false)
                 }
             })
         })
 
         $('body').on('click', '#picture', function() {
-            let name = $('#id_name').val()
-            let employee_id = $('#id_employee_id').val()
-            let email = $('#id_email').val()
+            // let name = $('#id_name').val()
+            // let employee_id = $('#id_employee_id').val()
+            // let email = $('#id_email').val()
 
-            if (name == '' || employee_id == '' || email == '') {
-                $('#error').text('Please filled in the above informations')
-            } else {
-                $('#error').text('')
-                $('.btn_text').prop('disabled', false)
-            }
+            // if (name == '' || employee_id == '' || email == '') {
+            //     $('#error').text('Please filled in the above informations')
+            // } else {
+            //     $('#error').text('')
+            // }
+            
+            $('#btn_text').prop('disabled', false)
+            $.ajax({
+                url: "{% url 'attendance:detect_face' %}",
+                method: 'GET',
+                success: function(response) {
+                    alert(response.message)
+                }
+            })
         })
     })
 </script>

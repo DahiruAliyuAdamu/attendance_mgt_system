@@ -22,7 +22,7 @@
         </div>
         <!-- Add more summary statistics as needed -->
     </div>
-
+    
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="bg-white rounded-lg shadow-lg p-8">
             <canvas id="attendanceChart" class="w-full"></canvas>
@@ -81,7 +81,7 @@
             data: {
                 labels: '{{ dates }}',
                 datasets: [{
-                    label: 'Attendance Trend',
+                    label: 'Daily Attendance Trend',
                     data: '{{ attendance_counts }}',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
@@ -108,8 +108,8 @@
             data: {
                 labels: '{{months}}',  // Labels for x-axis (e.g., categories or time periods)
                 datasets: [{
-                    label: 'Attendance Counts',
-                    data: '{{attendance_counts}}',   // Attendance counts for corresponding labels
+                    label: 'Attendance Counts per Month',
+                    data: '{{attendance_counts_month}}',   // Attendance counts for corresponding labels
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1

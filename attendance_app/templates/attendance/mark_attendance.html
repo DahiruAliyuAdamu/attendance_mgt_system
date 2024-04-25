@@ -28,7 +28,9 @@
                 <div class="text-red-600 rounded-md mb-2">
                     <p class="id_error"></p>
                 </div>                
-                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Mark Attendance</button>
+                <button id="btn_mark" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                    Mark Attendance
+                </button>
             </form>
         </div>
     </div>
@@ -50,7 +52,12 @@
                     method: 'POST',
                     data: $(this).serialize(),
                     beforeSend: function() {
-                        
+                        $('.loader').show()
+                        $('#btn_mark').html(`
+                            <div class="loader w-6 h-6 mr-2 border-t-4 border-b-4 border-blue-500 rounded-full animate-spin"></div>
+                            Marking Attendance...
+                        `)
+                        $('#btn_mark').prop('disabled', true)
                     },
                     success: function(response) {
                         if (response.status == 'success') {
@@ -60,7 +67,9 @@
                         }
                     },
                     complete: function() {
-                        
+                        $('.loader').hide()
+                        $('#btn_mark').text('Mark Attendance')
+                        $('#btn_mark').prop('disabled', false)
                     },
                     error: function(err) {
                         alert(err)

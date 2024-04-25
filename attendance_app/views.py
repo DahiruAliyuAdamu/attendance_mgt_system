@@ -6,6 +6,9 @@ from datetime import datetime
 from django.db.models import Count
 from django.db.models.functions import ExtractMonth, ExtractWeek
 import calendar
+import cv2
+
+from .face_detection_recognition import *
 from .models import Employee, AttendanceRecord
 from .forms import EmployeeForm
 from .utils import *
@@ -19,18 +22,25 @@ class HomeView(View):
 class RegisterEmployeeView(LoginRequiredMixin, View):
     def get(self, request):
         form = EmployeeForm()
+        
         return render(request, 'attendance/register_employee.html', {'form': form})
 
     def post(self, request):
         form = EmployeeForm(request.POST)
-        print(form)
+        
         if form.is_valid():
             print('success')
+
             staff = form.save(commit=False)
+            add_new_user(staff.name, staff.employee_id)
             staff.save()
 
             return JsonResponse({'status': 'success', 'message': 'register successful', 'id': staff.employee_id})
-        return JsonResponse({'status': 'error', 'message': 'An error occured'})
+        return JsonResponse({'status': 'error', 'message': 'ID or Email already taken'})
+    
+def detect_face(request):
+    
+    return JsonResponse({'message': 'Face Detected'})
         
 class MarkAttendanceView(LoginRequiredMixin, View):
     def get(self, request):
@@ -43,7 +53,7 @@ class MarkAttendanceView(LoginRequiredMixin, View):
         
         # Logic for capturing images, face detection, recognition, and recording attendance
         action = request.POST.get('action')
-        print(action)
+       
         if not employee_id or not action:
             return JsonResponse({'status': 'error', 'message': 'Employee ID and action are required'})
 
@@ -51,6 +61,7 @@ class MarkAttendanceView(LoginRequiredMixin, View):
         if not employee:
             return JsonResponse({'status': 'error', 'message': f'Employee with {employee_id} ID does not exists'})
         
+        mark_attendance()
         attendance_record = AttendanceRecord.objects.filter(employee_id=employee, date=datetime.now().date()).first()
         
         if action == 'time_in':
@@ -68,7 +79,7 @@ class MarkAttendanceView(LoginRequiredMixin, View):
             else:
                 attendance_record.break_time = datetime.now()
                 attendance_record.save()
-                return JsonResponse({'status': 'error', 'message': 'Break time marked successfully'})
+                return JsonResponse({'status': 'success', 'message': 'Break time marked successfully'})
 
         elif action == 'time_out':
             if not attendance_record or not attendance_record.time_in:
@@ -115,6 +126,9 @@ class ViewAttendanceReportView(LoginRequiredMixin, View):
             dates.append(current_date.strftime('%Y-%m-%d'))
             attendance_counts.append(count)
 
+        print(dates)
+        print(attendance_counts)
+
         attendance_counts_by_month = AttendanceRecord.objects.annotate(
             month=ExtractMonth('date')
         ).values('month').annotate(
@@ -146,6 +160,6 @@ class ViewAttendanceReportView(LoginRequiredMixin, View):
             'attendance_counts': attendance_counts,
 
             'months': months_list,
-            'attendance_counts': attendance_counts_list,
+            'attendance_counts_month': attendance_counts_list,
         }
         return render(request, 'attendance/view_attendance_report.html', context)
