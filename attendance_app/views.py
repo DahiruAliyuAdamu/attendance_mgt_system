@@ -29,8 +29,6 @@ class RegisterEmployeeView(LoginRequiredMixin, View):
         form = EmployeeForm(request.POST)
         
         if form.is_valid():
-            print('success')
-
             staff = form.save(commit=False)
             add_new_user(staff.name, staff.employee_id)
             staff.save()
@@ -42,14 +40,13 @@ def detect_face(request):
     
     return JsonResponse({'message': 'Face Detected'})
         
-class MarkAttendanceView(LoginRequiredMixin, View):
+class MarkAttendanceView(View):
     def get(self, request):
         # Logic for capturing images, face detection, recognition, and rendering form
         return render(request, 'attendance/mark_attendance.html')
 
     def post(self, request):
         employee_id = request.POST['employee_id']
-        print(employee_id)
         
         # Logic for capturing images, face detection, recognition, and recording attendance
         action = request.POST.get('action')
@@ -125,9 +122,6 @@ class ViewAttendanceReportView(LoginRequiredMixin, View):
         if current_date is not None:
             dates.append(current_date.strftime('%Y-%m-%d'))
             attendance_counts.append(count)
-
-        print(dates)
-        print(attendance_counts)
 
         attendance_counts_by_month = AttendanceRecord.objects.annotate(
             month=ExtractMonth('date')

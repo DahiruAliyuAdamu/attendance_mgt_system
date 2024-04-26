@@ -20,14 +20,12 @@
                     <p class="error"></p>
                 </div>
                 <div class="flex items-center justify-between">
-                    <button id="picture" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 flex justify-center items-center" type="button">Take a Picture</button>
+                    <!-- <button id="picture" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 flex justify-center items-center" type="button">Take a Picture</button> -->
                     <button id="btn_text" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 flex justify-center items-center" type="submit">
                         Register
                     </button>
                 </div>
             </form>
-
-            <!-- <input type="hidden" name="emp_id" id="emp_id"> -->
         </div>
     </div>
 {% endblock %}
@@ -35,8 +33,6 @@
 {% block js %}
 <script>
     $('.loader').hide()
-    $('#btn_text').prop('disabled', true)
-    // $('#picture').fadeOut(); // Hide with fade animation
 
     $(document).ready(function() {
         $('body').on('submit', '#form_reg', function(e) {
@@ -52,16 +48,18 @@
                         <div class="loader w-6 h-6 mr-2 border-t-4 border-b-4 border-blue-500 rounded-full animate-spin"></div>
                         Please wait...
                     `)
-                    $('#btn_text').prop('disabled', true)
                 },
                 success: function(response) {
                     if (response.status == 'success') {
+                        $('.message').show()
                         $('.message').text(response.message)
                         $('#form_reg').trigger('reset')
+                        $('.error_message').hide()
                     } else {
+                        $('.error_message').show()
                         $('.error_message').text(response.message)
+                        $('.message').hide()
                     }
-                    // $('#attendance-result').html(response)
                 },
                 error: function(err) {
                     alert(err)
@@ -69,28 +67,6 @@
                 complete: function() {
                     $('.loader').hide()
                     $('#btn_text').text('Register')
-                    $('#btn_text').prop('disabled', false)
-                }
-            })
-        })
-
-        $('body').on('click', '#picture', function() {
-            // let name = $('#id_name').val()
-            // let employee_id = $('#id_employee_id').val()
-            // let email = $('#id_email').val()
-
-            // if (name == '' || employee_id == '' || email == '') {
-            //     $('#error').text('Please filled in the above informations')
-            // } else {
-            //     $('#error').text('')
-            // }
-            
-            $('#btn_text').prop('disabled', false)
-            $.ajax({
-                url: "{% url 'attendance:detect_face' %}",
-                method: 'GET',
-                success: function(response) {
-                    alert(response.message)
                 }
             })
         })

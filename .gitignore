@@ -10,6 +10,8 @@ staticfiles/
 
 # Media files uploaded by users
 media/
+static/faces/
 
 # Environment configuration file
 .env
+todo

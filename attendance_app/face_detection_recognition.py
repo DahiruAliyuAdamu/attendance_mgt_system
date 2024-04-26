@@ -6,7 +6,7 @@ from sklearn.neighbors import KNeighborsClassifier
 import datetime
 
 face_detector = cv2.CascadeClassifier('attendance_app/resources/haarcascade_frontalface_default.xml')
-nimgs = 10
+nimgs = 20
 
 # get a number of total registered users
 def totalreg():
