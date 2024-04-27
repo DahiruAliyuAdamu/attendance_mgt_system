@@ -53,7 +53,7 @@
                     <td class="border px-4 py-2">{{ record.employee.employee_id }}</td>
                     <td class="border px-4 py-2">{{ record.employee.name }}</td>
                     <td class="border px-4 py-2">{{ record.date }}</td>
-                    <td class="border px-4 py-2">{{ record.time_in|time:"H:i:s" }}</td>
+                    <td class="border px-4 py-2">{{ record.time_in }}</td>
                     <td class="border px-4 py-2">{% if record.break_time|time:"H:i:s" %}{{ record.break_time }}{% else %}N/A{% endif %}</td>
                     <td class="border px-4 py-2">{% if record.time_out|time:"H:i:s" %}{{ record.time_out }}{% else %}N/A{% endif %}</td>
                     <!-- <td class="border px-4 py-2">
@@ -63,7 +63,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td class="border px-4 py-2" colspan="5">No attendance records found.</td>
+                    <td class="border px-4 py-2 text-red-600" colspan="5">No attendance records found.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -85,12 +85,12 @@
 
         let ctx = document.getElementById('attendanceChart').getContext('2d');
         let myChart = new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
-                labels: '{{ dates }}',
+                labels: [{% for date in dates %} '{{ date }}', {% endfor %}],
                 datasets: [{
                     label: 'Daily Attendance Trend',
-                    data: '{{ attendance_counts }}',
+                    data: [{% for attendance in attendance_counts %} {{ attendance }}, {% endfor %}],
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
@@ -114,10 +114,10 @@
         let barChart = new Chart(ctx1, {
             type: 'bar',
             data: {
-                labels: '{{months}}',  // Labels for x-axis (e.g., categories or time periods)
+                labels: [{% for month in months %} '{{ month }}', {% endfor %}],  // Labels for x-axis (e.g., categories or time periods)
                 datasets: [{
                     label: 'Attendance Counts per Month',
-                    data: '{{attendance_counts_month}}',   // Attendance counts for corresponding labels
+                    data: [{% for attendance in attendance_counts_month %} {{ attendance }}, {% endfor %}],   // Attendance counts for corresponding labels
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
