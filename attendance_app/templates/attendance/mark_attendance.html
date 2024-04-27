@@ -9,9 +9,9 @@
             <!-- Your attendance marking interface goes here -->
             <form method="post" enctype="multipart/form-data" class="max-w-sm mx-auto mark_attendance">
                 {% csrf_token %}
-                <div class="text-red-600 text-center rounded-md mb-2">
-                    <p class="error_message"></p>
-                    <p class="success_message"></p>
+                <div class="text-center rounded-md mb-2">
+                    <p class="error_message text-red-600"></p>
+                    <p class="success_message text-green-600"></p>
                 </div>               
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="employee_id">Employee ID</label>
