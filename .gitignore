@@ -14,4 +14,4 @@ media/
 # Environment configuration file
 .env
 
-static/faces/
+attendance_app/static/faces/
