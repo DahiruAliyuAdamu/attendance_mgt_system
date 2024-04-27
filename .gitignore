@@ -14,5 +14,4 @@ media/
 # Environment configuration file
 .env
 
-
 static/faces/
