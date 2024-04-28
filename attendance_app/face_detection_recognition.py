@@ -49,21 +49,48 @@ def mark_attendance():
     
     ret = True
     cap = cv2.VideoCapture(0)
+    id_number = ''
     while ret:
         ret, frame = cap.read()
         if len(extract_faces(frame)) > 0:
             (x, y, w, h) = extract_faces(frame)[0]
-            cv2.rectangle(frame, (x, y), (x+w, y+h), (86, 32, 251), 1)
-            cv2.rectangle(frame, (x, y), (x+w, y-40), (86, 32, 251), -1)
             face = cv2.resize(frame[y:y+h, x:x+w], (50, 50))
             identified_person = identify_face(face.reshape(1, -1))[0]
-            cv2.putText(frame, f'{identified_person}', (x+5, y-5),
+            id_number = identified_person.split('_')[1]
+            employee_name = identified_person.split('_')[0]
+
+            if id_number:
+                cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 1)
+                cv2.rectangle(frame, (x, y), (x+w, y-40), (0, 255, 0), -1)
+                cv2.putText(frame, f'{employee_name}', (x+5, y-5),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+            else:
+                cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 0, 255), 1)
+                cv2.rectangle(frame, (x, y), (x+w, y-40), (0, 0, 255), -1)
+                cv2.putText(frame, 'Not Staff', (x+5, y-5),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
         cv2.imshow('Attendance', frame)
         if cv2.waitKey(1) == 27:
             break
     cap.release()
     cv2.destroyAllWindows()
+
+    return id_number
+
+    # for (x, y, w, h) in features:
+    #     cv2.rectangle(img, (x, y), (x+w, y+h), color, 2)
+    #     id, pred = clf.predict(gray_image[y:y+h, x:x+w])
+    #     confidence = int(100 * (1 - pred / 300))
+
+    #     if confidence > 77:
+    #         if id == 1:
+    #             cv2.putText(img, "El Hussaini", (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 1, cv2.LINE_AA)
+    #         if id == 2:
+    #             cv2.putText(img, "Dahiru", (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 1, cv2.LINE_AA)
+    #     else:
+    #         cv2.putText(img, "UNKNOWN", (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0,0,255), 1, cv2.LINE_AA)
+
+    #     coords = [x, y, w, h]
     
 
 # A function to add a new user.

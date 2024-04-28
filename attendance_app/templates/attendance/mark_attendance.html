@@ -6,7 +6,6 @@
     <div class="flex items-center justify-center h-screen">
         <div class="bg-white p-8 shadow-md rounded-lg max-w-md w-full">
             <h1 class="text-2xl font-bold mb-4">Mark Attendance</h1>
-            <!-- Your attendance marking interface goes here -->
             <form method="post" enctype="multipart/form-data" class="max-w-sm mx-auto mark_attendance">
                 {% csrf_token %}
                 <div class="text-center rounded-md mb-2">
@@ -28,8 +27,12 @@
                 <div class="text-red-600 rounded-md mb-2">
                     <p class="id_error"></p>
                 </div>                
-                <button id="btn_mark" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex justify-center items-center" type="submit">
+                <button id="btn_mark" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex justify-center items-center" type="submit">
                     Mark Attendance
+                </button>
+                <h2 class="w-full text-center my-2">Or use</h2>
+                <button id="face_recog" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex justify-center items-center" type="button">
+                    Face Recognition
                 </button>
             </form>
         </div>
@@ -39,12 +42,54 @@
 {% block js %}
 <script>
     $(document).ready(function() {
+        $('body').on('click', '#face_recog', function() {
+            let token = $('input[name="csrfmiddlewaretoken"]').val()
+            let action = $('#action').val()
+
+            $.ajax({
+                url: "{% url 'attendance:mark_attendance' %}",
+                method: 'POST',
+                data: {
+                    face:'face',
+                    action:action,
+                    'csrfmiddlewaretoken': token,
+                },
+                beforeSend: function() {
+                    $('#loader').show()
+                    $('#face_recog').html(`
+                        <div id="loader" class="w-6 h-6 mr-2 border-t-4 border-b-4 border-blue-500 rounded-full animate-spin"></div>
+                        Marking Attendance...
+                    `)
+                    $('#face_recog').prop('disabled', true)
+                },
+                success: function(response) {
+                    if (response.status == 'success') {
+                        $('.error_message').hide()
+                        $('.success_message').show()
+                        $('.success_message').text(response.message)
+                    } else {
+                        $('.success_message').hide()
+                        $('.error_message').show()
+                        $('.error_message').text(response.message)
+                    }
+                },
+                complete: function() {
+                    $('#loader').hide()
+                    $('#face_recog').text('Mark Attendance')
+                    $('#face_recog').prop('disabled', false)
+                },
+                error: function(err) {
+                    alert(err)
+                }
+            })
+        })
+
         $('body').on('submit', '.mark_attendance', function(e) {
             e.preventDefault()
             let employee_id = $('#employee_id').val()
 
             if (employee_id == '') {
-                $('.id_error').text('Error: Employee ID and action are required')
+               $('.id_error').text('Error: Employee ID and action are required')
             } else {
                 $('.id_error').text('')
                 $.ajax({
@@ -61,8 +106,12 @@
                     },
                     success: function(response) {
                         if (response.status == 'success') {
+                            $('.error_message').hide()
+                            $('.success_message').show()
                             $('.success_message').text(response.message)
                         } else {
+                            $('.success_message').hide()
+                            $('.error_message').show()
                             $('.error_message').text(response.message)
                         }
                     },

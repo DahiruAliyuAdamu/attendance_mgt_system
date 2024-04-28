@@ -46,8 +46,14 @@ class MarkAttendanceView(View):
         return render(request, 'attendance/mark_attendance.html')
 
     def post(self, request):
-        employee_id = request.POST['employee_id']
+        face_recog = request.POST.get('face', None)
+        if face_recog:
+            employee_id = mark_attendance()
+        else:
+            employee_id = request.POST.get('employee_id', None)
         
+        print(employee_id)
+
         # Logic for capturing images, face detection, recognition, and recording attendance
         action = request.POST.get('action')
        
@@ -55,38 +61,47 @@ class MarkAttendanceView(View):
             return JsonResponse({'status': 'error', 'message': 'Employee ID and action are required'})
 
         employee = Employee.objects.filter(employee_id=employee_id).first()
+        print(employee)
         if not employee:
             return JsonResponse({'status': 'error', 'message': f'Employee with {employee_id} ID does not exists'})
         
-        mark_attendance()
         attendance_record = AttendanceRecord.objects.filter(employee_id=employee, date=datetime.now().date()).first()
         
         if action == 'time_in':
             if attendance_record and attendance_record.time_in:
+                print("time in alredy")
                 return JsonResponse({'status': 'error', 'message': 'Time-in already marked for today'})
             else:
                 AttendanceRecord.objects.create(employee=employee, time_in=datetime.now())
+                print("time in")
                 return JsonResponse({'status': 'success', 'message': 'Time-in marked successfully'})
 
         elif action == 'break_time':
             if not attendance_record or not attendance_record.time_in:
+                print('break time - time in first')
                 return JsonResponse({'status': 'error', 'message': 'Time-in must be marked before break time'})
             elif attendance_record.break_time:
+                print('break time in already')
                 return JsonResponse({'status': 'error', 'message': 'Break time already marked for today'})
             else:
+                print('break time')
                 attendance_record.break_time = datetime.now()
                 attendance_record.save()
                 return JsonResponse({'status': 'success', 'message': 'Break time marked successfully'})
 
         elif action == 'time_out':
             if not attendance_record or not attendance_record.time_in:
+                print('Time out - time in first')
                 return JsonResponse({'status': 'error', 'message': 'Time-in must be marked before time-out'})
             elif attendance_record.time_out:
+                print('time out already')
                 return JsonResponse({'status': 'error', 'message': 'Time-out already marked for today'})
             else:
+                print('time out')
                 attendance_record.time_out = datetime.now()
                 attendance_record.save()
                 return JsonResponse({'status': 'success', 'message': 'Time-out marked successfully'})
+        print('Dont know')        
         return JsonResponse({'status': 'success', 'message': 'register successful'})
 
 class ViewAttendanceReportView(LoginRequiredMixin, View):
