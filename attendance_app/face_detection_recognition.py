@@ -76,21 +76,6 @@ def mark_attendance():
     cv2.destroyAllWindows()
 
     return id_number
-
-    # for (x, y, w, h) in features:
-    #     cv2.rectangle(img, (x, y), (x+w, y+h), color, 2)
-    #     id, pred = clf.predict(gray_image[y:y+h, x:x+w])
-    #     confidence = int(100 * (1 - pred / 300))
-
-    #     if confidence > 77:
-    #         if id == 1:
-    #             cv2.putText(img, "El Hussaini", (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 1, cv2.LINE_AA)
-    #         if id == 2:
-    #             cv2.putText(img, "Dahiru", (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 1, cv2.LINE_AA)
-    #     else:
-    #         cv2.putText(img, "UNKNOWN", (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0,0,255), 1, cv2.LINE_AA)
-
-    #     coords = [x, y, w, h]
     
 
 # A function to add a new user.
